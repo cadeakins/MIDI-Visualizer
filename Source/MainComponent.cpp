@@ -1,7 +1,8 @@
 #include "MainComponent.h"
 
+
 //==============================================================================
-MainComponent::MainComponent()
+MainComponent::MainComponent()  //Default constructor
 {
     setSize (600, 400);
     //Seeing what MIDI devices are available
@@ -25,11 +26,20 @@ MainComponent::MainComponent()
     else {
         juce::Logger::writeToLog("Failed to open MIDI input device.");
     }
+
+
+
+
+	//Testing PianoKeyboard component
+    addAndMakeVisible(pianoKeyboard);
 }
 
-MainComponent::~MainComponent()
+MainComponent::~MainComponent() //Default destructor
 {
-    midiInputDevice->stop();
+    if (midiInputDevice) {
+        midiInputDevice->stop();
+    }
+    
 }
 
 //==============================================================================
@@ -50,6 +60,7 @@ void MainComponent::resized()
     // This is called when the MainComponent is resized.
     // If you add any child components, this is where you should
     // update their positions.
+    pianoKeyboard.setBounds(getLocalBounds());
 }
 
 

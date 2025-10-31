@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include <memory>
+#include "PianoKeyboard.h"
 
 //==============================================================================
 /*
@@ -16,15 +17,16 @@ public:
     ~MainComponent() override;
 
     //==============================================================================
-    void paint (juce::Graphics&) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
 
 	void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override; //The callback for incoming MIDI messages
-
+	
 private:
     //==============================================================================
     // Your private member variables go here...
 	std::unique_ptr<juce::MidiInput> midiInputDevice; //Pointer to the MIDI input device
+    PianoKeyboard pianoKeyboard; //Instance of the PianoKeyboard component
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
