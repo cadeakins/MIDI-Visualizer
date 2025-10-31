@@ -1,0 +1,27 @@
+#Build Folders
+Builds/
+JuceLibraryCode/
+
+#Visual Studio
+.vs/
+*.user
+*.suo
+*.sln.docstates
+*.VC.db
+*.VC.opendb
+
+#Binaries
+*.exe
+*.dll
+*.obj
+*.pdb
+*.ilk
+*.lib
+*.exp
+
+#macOS
+.DS_Store
+
+#IDE
+*.swp
+*~
