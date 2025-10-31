@@ -29,6 +29,7 @@ MainComponent::MainComponent()
 
 MainComponent::~MainComponent()
 {
+    midiInputDevice->stop();
 }
 
 //==============================================================================
