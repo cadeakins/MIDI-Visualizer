@@ -17,6 +17,14 @@ MainComponent::MainComponent()
 	    //MY SPECIFIC DEVICE, CHANGE TO BE DYNAMIC LATER
         midiInputDevice = juce::MidiInput::openDevice(midiInputList[4].identifier, this);
     }
+
+    if (midiInputDevice) {
+        midiInputDevice->start();
+        juce::Logger::writeToLog("MIDI Input Device started.");
+	}
+    else {
+        juce::Logger::writeToLog("Failed to open MIDI input device.");
+    }
 }
 
 MainComponent::~MainComponent()
