@@ -1,4 +1,3 @@
-cat > README.md << 'EOF'
 # MIDI Keyboard Visualizer
 
 Real-time MIDI keyboard visualization built with JUCE and C++.
@@ -24,4 +23,3 @@ In development
 4. Build in Visual Studio
 5. Run 
 
-EOF
