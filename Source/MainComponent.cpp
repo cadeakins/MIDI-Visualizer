@@ -27,14 +27,6 @@ MainComponent::MainComponent()  //Default constructor
         juce::Logger::writeToLog("Failed to open MIDI input device.");
     }
 
-
-    //TESTING REMOVE
-	pianoKeyboard.setNotePressed(60, true);
-	pianoKeyboard.setNotePressed(64, true);
-
-
-
-
 	//Testing PianoKeyboard component
     addAndMakeVisible(pianoKeyboard);
 }
@@ -78,11 +70,27 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
     int noteNumber = message.getNoteNumber();
     juce::String noteName = message.getMidiNoteName(noteNumber, true, true, 4);
     juce::uint8 noteVelocity = message.getVelocity();
-    if (message.isNoteOn()) {
+    
+    if (message.isNoteOn()) {   //Hop onto UI thread instead of MIDI thread
         juce::Logger::writeToLog(noteName + "pressed with velocity " + juce::String(noteVelocity));
+        
+        if (message.getVelocity() > 0) {
+            juce::MessageManager::callAsync([this, noteNumber]() {
+                pianoKeyboard.setNotePressed(noteNumber, true);
+            });
+        }
+        else {  //Since some MIDI devices send Note On with velocity 0 instead of Note Off
+            juce::MessageManager::callAsync([this, noteNumber]() {
+                pianoKeyboard.setNotePressed(noteNumber, false);
+            });
+        }
+        
     }
-    else if (message.isNoteOff()) {
+	else if (message.isNoteOff()) { //Hop onto UI thread instead of MIDI thread
 		juce::Logger::writeToLog(noteName + " released");
+        juce::MessageManager::callAsync([this, noteNumber]() {
+            pianoKeyboard.setNotePressed(noteNumber, false);
+        });
     }
     
 }
