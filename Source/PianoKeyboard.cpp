@@ -18,7 +18,7 @@ PianoKeyboard::~PianoKeyboard() {
 }
 
 //==============================================================================
-void PianoKeyboard::paint(juce::Graphics& g) {
+void PianoKeyboard::paint(juce::Graphics& g) {  //Override the paint method to draw the piano keyboard
     int startNote = 21; //A0
 	int endNote = 108; //C8
 	int numWhiteKeys = 52; //There are 52 white keys on a standard piano
@@ -33,34 +33,56 @@ void PianoKeyboard::paint(juce::Graphics& g) {
     int whiteKeyIndex = 0; //Draw white keys
     for (int note = startNote; note <= endNote; note++) {
         if (isWhiteKey(note)) {
+            bool isPressed = (activeNotes.find(note) != activeNotes.end());
             float x = whiteKeyIndex * whiteKeyWidth;
 
-            g.setColour(juce::Colour(whiteKeyColor));
-            g.fillRect(x, 0.0f, whiteKeyWidth, (float)getHeight());
-            g.setColour(juce::Colours::lightgrey);
-            g.drawRect(x, 0.0f, whiteKeyWidth, (float)getHeight(), 0.5);
-            whiteKeyIndex++;
+            if (isPressed) {
+                g.setColour(juce::Colours::red);
+                g.fillRect(x, 0.0f, whiteKeyWidth, (float)getHeight());
+                g.setColour(juce::Colours::lightgrey);
+                g.drawRect(x, 0.0f, whiteKeyWidth, (float)getHeight(), 0.5);
+                whiteKeyIndex++;
+            }
+            else {
+                g.setColour(juce::Colour(whiteKeyColor));
+                g.fillRect(x, 0.0f, whiteKeyWidth, (float)getHeight());
+                g.setColour(juce::Colours::lightgrey);
+                g.drawRect(x, 0.0f, whiteKeyWidth, (float)getHeight(), 0.5);
+                whiteKeyIndex++;
+            }
+
         }
     }
 
     whiteKeyIndex = 0; //Draw black keys
     for (int note = startNote; note <= endNote; note++) {
+		bool isPressed = (activeNotes.find(note) != activeNotes.end());
         if (isWhiteKey(note)) {
             whiteKeyIndex++;
         }
         else {
-            float x = (whiteKeyIndex * whiteKeyWidth) - (blackKeyWidth / 2.0f);
+            if (isPressed) {
+                float x = (whiteKeyIndex * whiteKeyWidth) - (blackKeyWidth / 2.0f);
 
-            g.setColour(juce::Colour(blackKeyColor));
-            g.fillRect(x, 0.0f, blackKeyWidth, blackKeyHeight);
-			g.drawRect(x, 0.0f, blackKeyWidth, blackKeyHeight);
+                g.setColour(juce::Colours::red);
+                g.fillRect(x, 0.0f, blackKeyWidth, blackKeyHeight);
+                g.drawRect(x, 0.0f, blackKeyWidth, blackKeyHeight);
+
+            }
+            else {
+                float x = (whiteKeyIndex * whiteKeyWidth) - (blackKeyWidth / 2.0f);
+
+                g.setColour(juce::Colour(blackKeyColor));
+                g.fillRect(x, 0.0f, blackKeyWidth, blackKeyHeight);
+                g.drawRect(x, 0.0f, blackKeyWidth, blackKeyHeight);
+            }
         }
      }
     
 }
 
 
-bool PianoKeyboard::isWhiteKey(int midiNoteNumber) {
+bool PianoKeyboard::isWhiteKey(int midiNoteNumber) {    //Determine if a MIDI note number corresponds to a white key
     switch (midiNoteNumber % 12) {
         case 0: // C
         case 2: // D
@@ -73,4 +95,19 @@ bool PianoKeyboard::isWhiteKey(int midiNoteNumber) {
         default:
             return false;
     }
+}
+
+
+
+
+void PianoKeyboard::setNotePressed(int noteNumber, bool isPressed) {
+    if (isPressed) {
+        activeNotes.insert(noteNumber);
+		repaint(); // Trigger a repaint to show the pressed key
+    }
+    else {
+        activeNotes.erase(noteNumber);
+		repaint(); // Trigger a repaint to show the released key
+    }
+
 }

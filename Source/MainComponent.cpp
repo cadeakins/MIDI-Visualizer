@@ -28,6 +28,11 @@ MainComponent::MainComponent()  //Default constructor
     }
 
 
+    //TESTING REMOVE
+	pianoKeyboard.setNotePressed(60, true);
+	pianoKeyboard.setNotePressed(64, true);
+
+
 
 
 	//Testing PianoKeyboard component

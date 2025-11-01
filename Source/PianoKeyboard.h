@@ -12,6 +12,7 @@
 
 #include <JuceHeader.h> 
 #include <memory>
+#include <set>
 
 class PianoKeyboard : public juce::Component
 {
@@ -20,9 +21,11 @@ public:
     ~PianoKeyboard() override;
     //==============================================================================
     void paint(juce::Graphics&) override;
+    void setNotePressed(int noteNumber, bool isPressed);
 
 
 private:
     bool isWhiteKey(int midiNoteNumber);
+    std::set<int> activeNotes;
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PianoKeyboard)
 };
