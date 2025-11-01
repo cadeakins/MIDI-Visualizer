@@ -60,7 +60,11 @@ void MainComponent::resized()
     // This is called when the MainComponent is resized.
     // If you add any child components, this is where you should
     // update their positions.
-    pianoKeyboard.setBounds(getLocalBounds());
+     juce::Rectangle localBounds = getLocalBounds();
+     int width = getWidth();
+     int height = getHeight();
+
+    pianoKeyboard.setBounds(0,(height - 80), width, 80);
 }
 
 

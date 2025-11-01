@@ -11,6 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h> 
+#include <memory>
 
 class PianoKeyboard : public juce::Component
 {
@@ -22,5 +23,6 @@ public:
 
 
 private:
+    bool isWhiteKey(int midiNoteNumber);
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PianoKeyboard)
 };
