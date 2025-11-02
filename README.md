@@ -19,7 +19,7 @@ In development
 # Build Instructions
 1. Install JUCE from https://juce.com/get-juce
 2. Open 'MIDIVisualizer.jucer' in Projucer
-3. Click "Save Porject and Open in IDE" (The VS button)
+3. Click "Save Project and Open in IDE" (The VS button)
 4. Build in Visual Studio
 5. Run 
 
