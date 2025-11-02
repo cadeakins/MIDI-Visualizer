@@ -75,8 +75,8 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
         juce::Logger::writeToLog(noteName + "pressed with velocity " + juce::String(noteVelocity));
         
         if (message.getVelocity() > 0) {
-            juce::MessageManager::callAsync([this, noteNumber]() {
-                pianoKeyboard.setNotePressed(noteNumber, true);
+            juce::MessageManager::callAsync([this, noteNumber, noteVelocity]() {
+                pianoKeyboard.setNotePressed(noteNumber, true, noteVelocity);
             });
         }
         else {  //Since some MIDI devices send Note On with velocity 0 instead of Note Off

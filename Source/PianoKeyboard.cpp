@@ -27,8 +27,6 @@ void PianoKeyboard::paint(juce::Graphics& g) {  //Override the paint method to d
 	float blackKeyWidth = whiteKeyWidth * 0.6f; //Black keys are typically narrower than white keys
 	float blackKeyHeight = getHeight() * 0.6f; //Black keys are typically shorter than white keys
     
-    juce::uint32 whiteKeyColor = 0xFFF3F3F3;
-    juce::uint32 blackKeyColor = 0xFF303030;
 
     int whiteKeyIndex = 0; //Draw white keys
     for (int note = startNote; note <= endNote; note++) {
@@ -37,10 +35,13 @@ void PianoKeyboard::paint(juce::Graphics& g) {  //Override the paint method to d
             float x = whiteKeyIndex * whiteKeyWidth;
 
             if (isPressed) {
-                g.setColour(juce::Colours::red);
-                g.fillRect(x, 0.0f, whiteKeyWidth, (float)getHeight());
-                g.setColour(juce::Colours::lightgrey);
-                g.drawRect(x, 0.0f, whiteKeyWidth, (float)getHeight(), 0.5);
+                int velocity = activeNotes[note];
+
+                juce::Colour velocityBasedColor = getVelocityColor(note);   //Get color related with velocity of note
+                g.setColour(juce::Colour(velocityBasedColor));  //Set the draw color 
+                g.fillRect(x, 0.0f, whiteKeyWidth, (float)getHeight()); //Draw filled rectangle
+                g.setColour(juce::Colours::lightgrey);  
+                g.drawRect(x, 0.0f, whiteKeyWidth, (float)getHeight(), 0.5);    //Draw outline
                 whiteKeyIndex++;
             }
             else {
@@ -61,15 +62,18 @@ void PianoKeyboard::paint(juce::Graphics& g) {  //Override the paint method to d
             whiteKeyIndex++;
         }
         else {
-            if (isPressed) {
+            if (isPressed) {    //Change color of key when pressed
                 float x = (whiteKeyIndex * whiteKeyWidth) - (blackKeyWidth / 2.0f);
+                int velocity = activeNotes[note];
 
-                g.setColour(juce::Colours::red);
+                juce::Colour velocityBasedColor = getVelocityColor(note);
+                g.setColour(juce::Colour(velocityBasedColor));
                 g.fillRect(x, 0.0f, blackKeyWidth, blackKeyHeight);
+                g.setColour(juce::Colours::lightgrey);
                 g.drawRect(x, 0.0f, blackKeyWidth, blackKeyHeight);
 
             }
-            else {
+            else {  //Return to default piano roll colors 
                 float x = (whiteKeyIndex * whiteKeyWidth) - (blackKeyWidth / 2.0f);
 
                 g.setColour(juce::Colour(blackKeyColor));
@@ -100,9 +104,9 @@ bool PianoKeyboard::isWhiteKey(int midiNoteNumber) {    //Determine if a MIDI no
 
 
 
-void PianoKeyboard::setNotePressed(int noteNumber, bool isPressed) {
+void PianoKeyboard::setNotePressed(int noteNumber, bool isPressed, int velocity) {
     if (isPressed) {
-        activeNotes.insert(noteNumber);
+        activeNotes[noteNumber] = velocity;
 		repaint(); // Trigger a repaint to show the pressed key
     }
     else {
@@ -110,4 +114,21 @@ void PianoKeyboard::setNotePressed(int noteNumber, bool isPressed) {
 		repaint(); // Trigger a repaint to show the released key
     }
 
+}
+
+
+juce::Colour PianoKeyboard::getVelocityColor(int noteNumber) {
+    int velocity = activeNotes[noteNumber];
+    float normalizedVelocity = velocity / 127.0f;    //Range of 0.0 - 1.0 for gradient
+
+    float t;    //Float to store sub-section normalized velocity to fit the 3 ranges
+
+    if (normalizedVelocity < 0.5f) {   //Green to yellow range
+        t = normalizedVelocity / 0.5f;   //Normalize velocity again to the green-yellow range, percent varies 0.0-1.0
+        return juce::Colour(velocityGreen).interpolatedWith(velocityYellow, t);
+    }
+    else {  //Yellow to red range
+        t = (normalizedVelocity - 0.5f) / 0.5f;   //Normalize velocity again to the yellow-red range, percent varies 0.0-1.0
+        return juce::Colour(velocityYellow).interpolatedWith(velocityRed, t);
+    }
 }
