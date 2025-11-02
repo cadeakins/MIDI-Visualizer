@@ -6,9 +6,9 @@ Real-time MIDI keyboard visualization built with JUCE and C++.
 In development
 
 # Planned Features
-- Real-time input from MIDI keyboard
-- Piano keyboard visualization
-- Velocity-based color coding
+✓ Real-time input from MIDI keyboard
+✓ Piano keyboard visualization
+✓ Velocity-based color coding
 - Midi Device selection
 
 # Using
