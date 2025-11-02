@@ -27,6 +27,7 @@ private:
     // Your private member variables go here...
 	std::unique_ptr<juce::MidiInput> midiInputDevice; //Pointer to the MIDI input device
     PianoKeyboard pianoKeyboard; //Instance of the PianoKeyboard component
+    juce::String midiDeviceName;    //Name of connected MIDI device
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

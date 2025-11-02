@@ -14,6 +14,7 @@ MainComponent::MainComponent()  //Default constructor
         for (int i = 0; i < midiInputList.size(); i++) {
             //g.drawText(midiInputs[i].name + " is available.", getLocalBounds(), juce::Justification::centred, true);
             juce::Logger::writeToLog("MIDI Input Device " + juce::String(i) + ": " + midiInputList[i].name + " ID: " + midiInputList[i].identifier + ")");
+            midiDeviceName = midiInputList[i].name;
         }
 	    //MY SPECIFIC DEVICE, CHANGE TO BE DYNAMIC LATER
         midiInputDevice = juce::MidiInput::openDevice(midiInputList[4].identifier, this);
@@ -48,8 +49,6 @@ void MainComponent::paint (juce::Graphics& g)
     g.setFont (juce::FontOptions (16.0f));
     g.setColour (juce::Colours::white);
 
-
-    //g.drawText("Hello World!", getLocalBounds(), juce::Justification::centred, true);
 }
 
 void MainComponent::resized()
