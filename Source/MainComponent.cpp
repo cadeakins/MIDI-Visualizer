@@ -12,13 +12,15 @@ MainComponent::MainComponent()  //Default constructor
     } 
     else {
         for (int i = 0; i < midiInputList.size(); i++) {
-            //g.drawText(midiInputs[i].name + " is available.", getLocalBounds(), juce::Justification::centred, true);
             juce::Logger::writeToLog("MIDI Input Device " + juce::String(i) + ": " + midiInputList[i].name + " ID: " + midiInputList[i].identifier + ")");
-            midiDeviceName = midiInputList[i].name;
         }
-	    //MY SPECIFIC DEVICE, CHANGE TO BE DYNAMIC LATER
-        midiInputDevice = juce::MidiInput::openDevice(midiInputList[4].identifier, this);
     }
+
+    //MY SPECIFIC DEVICE, CHANGE TO BE DYNAMIC LATER
+    midiInputDevice = juce::MidiInput::openDevice(midiInputList[4].identifier, this);
+    midiDeviceName = midiInputList[4].name;
+
+
 
     if (midiInputDevice) {
         midiInputDevice->start();
