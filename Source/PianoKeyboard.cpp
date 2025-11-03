@@ -38,20 +38,18 @@ void PianoKeyboard::paint(juce::Graphics& g) {  //Override the paint method to d
                 int velocity = activeNotes[note];
 
                 juce::Colour velocityBasedColor = getVelocityColor(note);   //Get color related with velocity of note
-                g.setColour(juce::Colour(velocityBasedColor));  //Set the draw color 
+                g.setColour(velocityBasedColor);  //Set the draw color 
                 g.fillRect(x, 0.0f, whiteKeyWidth, (float)getHeight()); //Draw filled rectangle
                 g.setColour(juce::Colours::lightgrey);  
                 g.drawRect(x, 0.0f, whiteKeyWidth, (float)getHeight(), 0.5);    //Draw outline
-                whiteKeyIndex++;
             }
             else {
                 g.setColour(juce::Colour(whiteKeyColor));
                 g.fillRect(x, 0.0f, whiteKeyWidth, (float)getHeight());
                 g.setColour(juce::Colours::lightgrey);
                 g.drawRect(x, 0.0f, whiteKeyWidth, (float)getHeight(), 0.5);
-                whiteKeyIndex++;
             }
-
+            whiteKeyIndex++;
         }
     }
 
@@ -67,7 +65,7 @@ void PianoKeyboard::paint(juce::Graphics& g) {  //Override the paint method to d
                 int velocity = activeNotes[note];
 
                 juce::Colour velocityBasedColor = getVelocityColor(note);
-                g.setColour(juce::Colour(velocityBasedColor));
+                g.setColour(velocityBasedColor);
                 g.fillRect(x, 0.0f, blackKeyWidth, blackKeyHeight);
                 g.setColour(juce::Colours::lightgrey);
                 g.drawRect(x, 0.0f, blackKeyWidth, blackKeyHeight);
@@ -86,7 +84,7 @@ void PianoKeyboard::paint(juce::Graphics& g) {  //Override the paint method to d
 }
 
 
-bool PianoKeyboard::isWhiteKey(int midiNoteNumber) {    //Determine if a MIDI note number corresponds to a white key
+bool PianoKeyboard::isWhiteKey(int midiNoteNumber) const {    //Determine if a MIDI note number corresponds to a white key
     switch (midiNoteNumber % 12) {
         case 0: // C
         case 2: // D
@@ -117,8 +115,13 @@ void PianoKeyboard::setNotePressed(int noteNumber, bool isPressed, int velocity)
 }
 
 
-juce::Colour PianoKeyboard::getVelocityColor(int noteNumber) {
-    int velocity = activeNotes[noteNumber];
+juce::Colour PianoKeyboard::getVelocityColor(int noteNumber) const {
+    auto it = activeNotes.find(noteNumber);
+    if (it == activeNotes.end()) {
+		return juce::Colour(whiteKeyColor); //Return default white key color if note is not active
+    }
+
+    int velocity = it->second;
     float normalizedVelocity = velocity / 127.0f;    //Range of 0.0 - 1.0 for gradient
 
     float t;    //Float to store sub-section normalized velocity to fit the 3 ranges

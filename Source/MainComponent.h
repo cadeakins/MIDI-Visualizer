@@ -10,7 +10,9 @@
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class MainComponent  : public juce::Component, public juce::MidiInputCallback
+class MainComponent  : public juce::Component, 
+                       public juce::MidiInputCallback,
+                       public::juce::Timer
 {
 public:
     //==============================================================================
@@ -23,6 +25,8 @@ public:
 
 	void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override; //The callback for incoming MIDI messages
     juce::Array<juce::MidiDeviceInfo> getMidiInputs(); //List of available MIDI input devices
+
+	void timerCallback() override; //Timer callback to monitor MIDI device changes
 private:
     //==============================================================================
     PianoKeyboard pianoKeyboard; //Instance of the PianoKeyboard component
@@ -34,6 +38,9 @@ private:
     //Helper functions
 	void openMidiInputByIndex(int index); //Open MIDI input device by index
 	void closeCurrentMidiInput(); //Close the current MIDI input device
+
+	int previousDeviceCount = 0; //Previous count of MIDI devices
+	int currentDeviceIndex = -1; //Index of the currently selected MIDI device
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

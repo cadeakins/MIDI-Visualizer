@@ -11,7 +11,8 @@
 #pragma once
 #include <JuceHeader.h>
 class Toolbar : public juce::Component,
-                private juce::ComboBox::Listener
+                private juce::ComboBox::Listener,
+                private juce::Timer
 {
 public:
     Toolbar();  //Constructor
@@ -30,9 +31,10 @@ private:
 	juce::Label deviceLabel; //Label for the dropdown
 
 	std::function<void(int)> deviceChangeCallback; //Callback function for device change
-
     void comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged) override;
 
+	void timerCallback() override;  //Timer callback to monitor device changes
+    int lastDeviceCount = 0;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Toolbar)
 };

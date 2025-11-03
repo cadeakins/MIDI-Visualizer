@@ -5,13 +5,18 @@
 MainComponent::MainComponent()  //Default constructor
 {
     setSize(600, 400);
-    //Testing PianoKeyboard component
+
     addAndMakeVisible(pianoKeyboard);
     addAndMakeVisible(toolbar);
 
     toolbar.setDeviceChangeCallback([this](int deviceIndex) {
         openMidiInputByIndex(deviceIndex);
-        });
+    });
+
+    toolbar.refreshDevicesList();
+    previousDeviceCount = juce::MidiInput::getAvailableDevices().size();
+
+	startTimer(2000); //Start timer to check for MIDI device changes every 2 seconds
 }
 
 MainComponent::~MainComponent() //Default destructor
@@ -29,7 +34,8 @@ void MainComponent::paint (juce::Graphics& g)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
     g.setFont (juce::FontOptions (16.0f));
-    g.setColour (juce::Colours::white);
+    g.setColour(juce::Colour(0xFF303030));
+    g.fillAll();
 
 }
 
@@ -54,11 +60,12 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
     juce::uint8 noteVelocity = message.getVelocity();
     
     if (message.isNoteOn()) {   //Hop onto UI thread instead of MIDI thread
-        juce::Logger::writeToLog(noteName + "pressed with velocity " + juce::String(noteVelocity));
+        
         
         if (message.getVelocity() > 0) {
-            juce::MessageManager::callAsync([this, noteNumber, noteVelocity]() {
+            juce::MessageManager::callAsync([this, noteNumber, noteVelocity, noteName]() {
                 pianoKeyboard.setNotePressed(noteNumber, true, noteVelocity);
+                juce::Logger::writeToLog(noteName + "pressed with velocity " + juce::String(noteVelocity));
             });
         }
         else {  //Since some MIDI devices send Note On with velocity 0 instead of Note Off
@@ -69,9 +76,9 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
         
     }
 	else if (message.isNoteOff()) { //Hop onto UI thread instead of MIDI thread
-		juce::Logger::writeToLog(noteName + " released");
-        juce::MessageManager::callAsync([this, noteNumber]() {
+        juce::MessageManager::callAsync([this, noteNumber, noteName]() {
             pianoKeyboard.setNotePressed(noteNumber, false);
+            juce::Logger::writeToLog(noteName + " released");
         });
     }
     
@@ -80,6 +87,8 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
 
 juce::Array<juce::MidiDeviceInfo> MainComponent::getMidiInputs() { //List of available MIDI input devices
     auto midiInputList = juce::MidiInput::getAvailableDevices();
+    
+#if JUCE_DEBUG  //Only runs following in debug mode
     if (midiInputList.isEmpty()) {
         juce::Logger::writeToLog("No MIDI input devices found.");
     }
@@ -88,6 +97,7 @@ juce::Array<juce::MidiDeviceInfo> MainComponent::getMidiInputs() { //List of ava
             juce::Logger::writeToLog("MIDI Input Device " + juce::String(i) + ": " + midiInputList[i].name + " ID: " + midiInputList[i].identifier + ")");
         }
     }
+#endif
     return midiInputList;
 }
 
@@ -123,7 +133,54 @@ void MainComponent::openMidiInputByIndex(int index) { //Open MIDI input device b
 }
 void MainComponent::closeCurrentMidiInput() { //Close the current MIDI input device
     if (midiInputDevice) {
-        midiInputDevice->stop();
-        midiInputDevice.reset();
+        try {
+            midiInputDevice->stop();
+            midiInputDevice.reset();
+			juce::Logger::writeToLog("MIDI input device closed");
+        }
+        catch (...) {
+            //If stop() fails just reset the pointer
+            midiInputDevice.reset();
+			juce::Logger::writeToLog("MIDI input device closed with exception");
+        }
+    }
+
+    midiDeviceName.clear();
+    currentDeviceIndex = -1;
+}
+
+
+void MainComponent::timerCallback() {
+    auto midiInputList = getMidiInputs();
+
+	//Check if device count has changed
+    if (midiInputList.size() != previousDeviceCount) {
+        previousDeviceCount = midiInputList.size();
+    
+        bool currentDeviceStillExists = false;
+
+        if (currentDeviceIndex >= 0 && currentDeviceIndex < midiInputList.size()) {
+            //Check if same device
+            if (midiInputDevice) {
+                juce::String currentDeviceID = midiInputDevice->getIdentifier();
+
+                //Search for device in new list
+                for (int i = 0; i < midiInputList.size(); i++) {
+                    if (midiInputList[i].identifier == currentDeviceID) {
+                        currentDeviceStillExists = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+
+        //If current device no longer exists, close it
+        if (!currentDeviceStillExists && midiInputDevice != nullptr) {
+            juce::Logger::writeToLog("Current device disconnected.");
+            closeCurrentMidiInput();
+            currentDeviceIndex = -1;
+        }
+        toolbar.refreshDevicesList();
     }
 }

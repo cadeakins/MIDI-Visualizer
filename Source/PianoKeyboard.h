@@ -38,8 +38,8 @@ private:
     const juce::Colour velocityRed{ 0xFFFF6B6B };
 
     // Private functions
-    bool isWhiteKey(int midiNoteNumber);
-    juce::Colour getVelocityColor(int noteNumber);
+    bool isWhiteKey(int midiNoteNumber) const;
+    juce::Colour getVelocityColor(int noteNumber) const;
     
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PianoKeyboard)
 };

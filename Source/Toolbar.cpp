@@ -13,9 +13,12 @@
 
 Toolbar::Toolbar() {  //Constructor
 	addAndMakeVisible(midiDropdown); //Add dropdown to the toolbar
-	midiDropdown.addListener(this); //Listen for changes in the dropdown
+	midiDropdown.addListener(this); //Listen for changes in the dropdown    
+	midiDropdown.setTextWhenNothingSelected("Select MIDI Device"); //Set default text)
+	
 
     refreshDevicesList(); //Populate the MIDI devices list
+	startTimer(3000); //Start timer to check for device changes every 3 seconds
 }
 Toolbar::~Toolbar() {}  //Destructor
 
@@ -26,7 +29,7 @@ void Toolbar::paint(juce::Graphics& g) {  //Paint method
     g.drawRect(0, 0, getWidth(), getHeight() - 7); //Draw the toolbar background
 
     juce::ColourGradient shadowGradient(
-        juce::Colour(0x70000000), //Semi-transparent black at the top
+        juce::Colour(0x30000000), //Semi-transparent black at the top
         0.0f, getHeight() - 7.0f,  //Start point (slightly above bottom)
         juce::Colour(0x00000000), //Fully transparent at the bottom
 		0.0f, (float)getHeight(), //End point (bottom)
@@ -45,6 +48,7 @@ void Toolbar::refreshDevicesList() { //Refresh the list of MIDI devices
     auto midiInputList = juce::MidiInput::getAvailableDevices();//Get the list of MIDI input devices
 
     midiDropdown.clear(juce::dontSendNotification); //Clear existing items
+	lastDeviceCount = midiInputList.size(); //Update last device count
 
     for (int i = 0; i < midiInputList.size(); i++) {
         midiDropdown.addItem(midiInputList[i].name, i + 1); //Add each device to the dropdown
@@ -62,5 +66,15 @@ void Toolbar::refreshDevicesList() { //Refresh the list of MIDI devices
             if (deviceChangeCallback) {
 				deviceChangeCallback(selectedIndex); //Invoke the callback with the selected index
             }
+        }
+    }
+
+    void Toolbar::timerCallback() {
+        auto midiInputList = juce::MidiInput::getAvailableDevices();
+
+        //Only refresh if device count changed
+        if (midiInputList.size() != lastDeviceCount) {
+            refreshDevicesList();
+            lastDeviceCount = midiInputList.size();
         }
     }
