@@ -9,7 +9,12 @@ In development
 ✓ Real-time input from MIDI keyboard
 ✓ Piano keyboard visualization
 ✓ Velocity-based color coding
-- Midi Device selection
+✓ Midi Device selection
+- Open and visualize MIDI files
+- Create falling animation for notes with color-based velocity
+- Volume slider
+- Tempo slider
+- Outputs sound
 
 # Using
 -JUCE Framework 8.0.10 
