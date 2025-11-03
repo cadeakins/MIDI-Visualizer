@@ -17,7 +17,7 @@ In development
 - Outputs sound
 
 # Using
--JUCE Framework 8.0.10 
+- JUCE Framework 8.0.10 
 - C++23
 - Visual Studio 2022
 
