@@ -18,8 +18,8 @@ In development
 
 # Using
 -JUCE Framework 8.0.10 
--C++23
--Visual Studio 2022
+- C++23
+- Visual Studio 2022
 
 # Build Instructions
 1. Install JUCE from https://juce.com/get-juce
