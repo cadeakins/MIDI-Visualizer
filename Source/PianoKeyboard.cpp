@@ -31,8 +31,8 @@ void PianoKeyboard::paint(juce::Graphics& g) {  //Override the paint method to d
     int whiteKeyIndex = 0; //Draw white keys
     for (int note = startNote; note <= endNote; note++) {
         if (isWhiteKey(note)) {
-            bool isPressed = (activeNotes.find(note) != activeNotes.end());
-            float x = whiteKeyIndex * whiteKeyWidth;
+			bool isPressed = (activeNotes.find(note) != activeNotes.end()); //Check if the note is currently pressed
+            float x = whiteKeyIndex * whiteKeyWidth;    //Position of the white key
 
             if (isPressed) {
                 int velocity = activeNotes[note];

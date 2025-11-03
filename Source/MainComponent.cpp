@@ -4,34 +4,14 @@
 //==============================================================================
 MainComponent::MainComponent()  //Default constructor
 {
-    setSize (600, 400);
-    //Seeing what MIDI devices are available
-    auto midiInputList = juce::MidiInput::getAvailableDevices();
-    if (midiInputList.isEmpty()) {
-        juce::Logger::writeToLog("No MIDI input devices found.");
-    } 
-    else {
-        for (int i = 0; i < midiInputList.size(); i++) {
-            juce::Logger::writeToLog("MIDI Input Device " + juce::String(i) + ": " + midiInputList[i].name + " ID: " + midiInputList[i].identifier + ")");
-        }
-    }
-
-    //MY SPECIFIC DEVICE, CHANGE TO BE DYNAMIC LATER
-    midiInputDevice = juce::MidiInput::openDevice(midiInputList[4].identifier, this);
-    midiDeviceName = midiInputList[4].name;
-
-
-
-    if (midiInputDevice) {
-        midiInputDevice->start();
-        juce::Logger::writeToLog("MIDI Input Device started.");
-	}
-    else {
-        juce::Logger::writeToLog("Failed to open MIDI input device.");
-    }
-
-	//Testing PianoKeyboard component
+    setSize(600, 400);
+    //Testing PianoKeyboard component
     addAndMakeVisible(pianoKeyboard);
+    addAndMakeVisible(toolbar);
+
+    toolbar.setDeviceChangeCallback([this](int deviceIndex) {
+        openMidiInputByIndex(deviceIndex);
+        });
 }
 
 MainComponent::~MainComponent() //Default destructor
@@ -63,6 +43,7 @@ void MainComponent::resized()
      int height = getHeight();
 
     pianoKeyboard.setBounds(0,(height - 80), width, 80);
+    toolbar.setBounds(0, 0, width, 50);
 }
 
 
@@ -94,4 +75,55 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
         });
     }
     
+}
+
+
+juce::Array<juce::MidiDeviceInfo> MainComponent::getMidiInputs() { //List of available MIDI input devices
+    auto midiInputList = juce::MidiInput::getAvailableDevices();
+    if (midiInputList.isEmpty()) {
+        juce::Logger::writeToLog("No MIDI input devices found.");
+    }
+    else {
+        for (int i = 0; i < midiInputList.size(); i++) {
+            juce::Logger::writeToLog("MIDI Input Device " + juce::String(i) + ": " + midiInputList[i].name + " ID: " + midiInputList[i].identifier + ")");
+        }
+    }
+    return midiInputList;
+}
+
+
+void MainComponent::openMidiInputByIndex(int index) { //Open MIDI input device by index
+    auto midiInputList = getMidiInputs();
+    //Check if index is valid
+    if (index < 0 || index >= midiInputList.size()) {
+        closeCurrentMidiInput();
+        return;
+    }
+
+    //If index device is already open
+    if (midiInputDevice && midiInputDevice->getIdentifier() == midiInputList[index].identifier) {
+        return;
+    }
+
+    //If the index exists and is not the currently open device
+
+    closeCurrentMidiInput();
+
+    //Open new device
+    midiInputDevice = juce::MidiInput::openDevice(midiInputList[index].identifier, this);
+
+    if (midiInputDevice) {
+        midiInputDevice->start();
+        juce::Logger::writeToLog("MIDI input device started");
+    }
+    else {
+        juce::Logger::writeToLog("MIDI input device failed to open");
+    }
+
+}
+void MainComponent::closeCurrentMidiInput() { //Close the current MIDI input device
+    if (midiInputDevice) {
+        midiInputDevice->stop();
+        midiInputDevice.reset();
+    }
 }
