@@ -17,6 +17,7 @@
 class PianoKeyboard : public juce::Component
 {
 public:
+    //==============================================================================
     PianoKeyboard();
     ~PianoKeyboard() override;
     //==============================================================================
@@ -25,6 +26,7 @@ public:
 
 
 private:
+    //==============================================================================
     // Ordered map of notes being pushed down
     std::map<int, int> activeNotes;
     // Key colors

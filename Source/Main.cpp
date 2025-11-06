@@ -23,15 +23,13 @@ public:
     //==============================================================================
     void initialise (const juce::String& commandLine) override
     {
-        // This method is where you should put your application's initialisation code..
-
+        // Application's initialisation code
         mainWindow.reset (new MainWindow (getApplicationName()));
     }
 
     void shutdown() override
     {
-        // Add your application's shutdown code here..
-
+        // Application's shutdown code here
         mainWindow = nullptr; // (deletes our window)
         
     }
@@ -56,6 +54,7 @@ public:
         This class implements the desktop window that contains an instance of
         our MainComponent class.
     */
+
     class MainWindow    : public juce::DocumentWindow
     {
     public:

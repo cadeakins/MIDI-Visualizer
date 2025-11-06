@@ -10,14 +10,13 @@
 
 #include "PianoKeyboard.h"
 
-PianoKeyboard::PianoKeyboard() {
+//==============================================================================
 
-}
-PianoKeyboard::~PianoKeyboard() {
-
-}
+PianoKeyboard::PianoKeyboard() {}
+PianoKeyboard::~PianoKeyboard() {}
 
 //==============================================================================
+
 void PianoKeyboard::paint(juce::Graphics& g) {  //Override the paint method to draw the piano keyboard
     int startNote = 21; //A0
 	int endNote = 108; //C8

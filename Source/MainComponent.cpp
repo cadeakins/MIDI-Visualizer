@@ -28,6 +28,7 @@ MainComponent::~MainComponent() //Default destructor
 }
 
 //==============================================================================
+
 void MainComponent::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
@@ -104,19 +105,19 @@ juce::Array<juce::MidiDeviceInfo> MainComponent::getMidiInputs() { //List of ava
 
 void MainComponent::openMidiInputByIndex(int index) { //Open MIDI input device by index
     auto midiInputList = getMidiInputs();
+
     //Check if index is valid
     if (index < 0 || index >= midiInputList.size()) {
         closeCurrentMidiInput();
         return;
     }
 
-    //If index device is already open
+    //If index device is already open, no change needed
     if (midiInputDevice && midiInputDevice->getIdentifier() == midiInputList[index].identifier) {
         return;
     }
 
     //If the index exists and is not the currently open device
-
     closeCurrentMidiInput();
 
     //Open new device
@@ -139,7 +140,7 @@ void MainComponent::closeCurrentMidiInput() { //Close the current MIDI input dev
 			juce::Logger::writeToLog("MIDI input device closed");
         }
         catch (...) {
-            //If stop() fails just reset the pointer
+			//If stop() fails just reset the pointer, helpful if device is disconnected unexpectedly
             midiInputDevice.reset();
 			juce::Logger::writeToLog("MIDI input device closed with exception");
         }
